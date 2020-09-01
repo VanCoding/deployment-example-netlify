@@ -8,27 +8,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Post {
-  id        Int      @default(autoincrement()) @id
-  createdAt DateTime @default(now())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  author    User     @relation(fields: [authorId], references: [id]) // renamed from `User` -> `author`
-  authorId  Int // relation scalar field
+model order_item_options {
+  group       String
+  id          String      @id
+  item        String
+  value       String[]
+  order_items order_items @relation(fields: [item], references: [id])
 }
 
-model Profile {
-  id     Int     @default(autoincrement()) @id
-  bio    String?
-  userId Int     @unique  // relation scalar field
-  user   User    @relation(fields: [userId], references: [id]) // renamed from `User` -> `user`
+model order_items {
+  comment            String               @default("")
+  id                 String               @id
+  item               String
+  order              String
+  orders             orders               @relation(fields: [order], references: [id])
+  options order_item_options[]
 }
 
-model User {
-  id      Int      @default(autoincrement()) @id
-  email   String   @unique
-  name    String?
-  posts   Post[] // renamed from `Post` -> `posts`
-  profile Profile? // renamed from `User` -> `profile`
+model orders {
+  id          String        @id
+  time        DateTime
+  items order_items[]
 }
